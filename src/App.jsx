@@ -75,12 +75,12 @@ const LaborAlphaDashboard = () => {
   ];
 
   const tightenssData = [
-    { month: 'Oct 25', openings: 8.7, ratio: 1.45 },
-    { month: 'Nov 25', openings: 8.55, ratio: 1.35 },
-    { month: 'Dec 25', openings: 8.42, ratio: 1.28 },
-    { month: 'Jan 26', openings: 8.58, ratio: 1.32 },
-    { month: 'Feb 26', openings: 8.28, ratio: 1.20 },
-    { month: 'Mar 26', openings: 8.12, ratio: 1.08 }
+    { month: 'Oct 25', openings: 8.7, ratio: 1.42 },
+    { month: 'Nov 25', openings: 8.52, ratio: 1.30 },
+    { month: 'Dec 25', openings: 8.40, ratio: 1.25 },
+    { month: 'Jan 26', openings: 8.60, ratio: 1.30 },
+    { month: 'Feb 26', openings: 8.28, ratio: 1.18 },
+    { month: 'Mar 26', openings: 8.10, ratio: 1.08 }
   ];
 
   const claimsData = [
@@ -415,15 +415,40 @@ const LaborAlphaDashboard = () => {
                   <p className="text-slate-500 text-xs mb-12 italic">Job Openings (M) vs. Openings per Unemployed Ratio</p>
                   <div className="h-[400px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={tightenssData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="month" stroke="#475569" fontSize={11} />
-                        <YAxis yAxisId="left" orientation="left" stroke="#38bdf8" fontSize={11} />
-                        <YAxis yAxisId="right" orientation="right" stroke="#f59e0b" fontSize={11} />
-                        <Tooltip />
-                        <Legend />
-                        <Line yAxisId="left" type="monotone" dataKey="openings" name="Job Openings (M)" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4 }} />
-                        <Line yAxisId="right" type="monotone" dataKey="ratio" name="Ratio (Openings / Unemployed)" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
+                      <LineChart data={tightenssData} margin={{ top: 10, right: 30, left: 10, bottom: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                        <XAxis 
+                          dataKey="month" 
+                          stroke="#475569" 
+                          fontSize={10} 
+                          axisLine={false} 
+                          tickLine={false} 
+                          dy={10}
+                        />
+                        <YAxis 
+                          yAxisId="left" 
+                          orientation="left" 
+                          stroke="#38bdf8" 
+                          fontSize={10} 
+                          axisLine={false} 
+                          tickLine={false} 
+                          domain={[8.1, 8.7]}
+                          ticks={[8.1, 8.25, 8.4, 8.55, 8.7]}
+                        />
+                        <YAxis 
+                          yAxisId="right" 
+                          orientation="right" 
+                          stroke="#f59e0b" 
+                          fontSize={10} 
+                          axisLine={false} 
+                          tickLine={false} 
+                          domain={[1, 1.5]}
+                          ticks={[1, 1.15, 1.3, 1.5]}
+                        />
+                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }} />
+                        <Legend align="center" verticalAlign="bottom" iconType="circle" wrapperStyle={{ paddingTop: '30px', fontSize: '10px', textTransform: 'none' }} />
+                        <Line yAxisId="left" type="monotone" dataKey="openings" name="Job Openings (M)" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4, fill: '#38bdf8' }} />
+                        <Line yAxisId="right" type="monotone" dataKey="ratio" name="Ratio (Openings / Unemployed)" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4, fill: '#f59e0b' }} />
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
