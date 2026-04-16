@@ -84,22 +84,22 @@ const LaborAlphaDashboard = () => {
   ];
 
   const claimsData = [
-    { week: 'Feb W1', initial: 212, continuing: 1885 },
-    { week: 'Feb W2', initial: 216, continuing: 1895 },
-    { week: 'Feb W3', initial: 209, continuing: 1892 },
-    { week: 'Feb W4', initial: 211, continuing: 1905 },
-    { week: 'Mar W1', initial: 218, continuing: 1915 },
-    { week: 'Mar W2', initial: 219, continuing: 1920 }
+    { week: 'Feb W1', initial: 212, continuing: 1880 },
+    { week: 'Feb W2', initial: 215, continuing: 1902 },
+    { week: 'Feb W3', initial: 209, continuing: 1900 },
+    { week: 'Feb W4', initial: 211, continuing: 1912 },
+    { week: 'Mar W1', initial: 218, continuing: 1918 },
+    { week: 'Mar W2', initial: 214, continuing: 1920 }
   ];
 
   const indeedIndexData = [
-    { week: 'Feb W1', value: 125, oscillator: 1.2 },
-    { week: 'Feb W2', value: 122, oscillator: 0.8 },
-    { week: 'Feb W3', value: 118, oscillator: 0.2 },
-    { week: 'Feb W4', value: 115, oscillator: -0.1 },
-    { week: 'Mar W1', value: 112, oscillator: -0.5 },
-    { week: 'Mar W2', value: 110, oscillator: -1.2 },
-    { week: 'Mar W3', value: 108, oscillator: -2.1 }
+    { week: 'Feb W1', value: 118, oscillator: 1.5 },
+    { week: 'Feb W2', value: 116, oscillator: 1.2 },
+    { week: 'Feb W3', value: 115, oscillator: 0.8 },
+    { week: 'Feb W4', value: 114, oscillator: 0.2 },
+    { week: 'Mar W1', value: 115, oscillator: 0.4 },
+    { week: 'Mar W2', value: 112, oscillator: -0.5 },
+    { week: 'Mar W3', value: 110, oscillator: -1.5 }
   ];
 
   const fedSoftLandingData = [
@@ -472,15 +472,39 @@ const LaborAlphaDashboard = () => {
                   <p className="text-slate-500 text-xs mb-12 italic">Initial vs Continuing Claims (000s) - Lagging Lead</p>
                   <div className="h-[400px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={claimsData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="week" stroke="#475569" fontSize={11} />
-                        <YAxis yAxisId="left" stroke="#f43f5e" fontSize={11} />
-                        <YAxis yAxisId="right" orientation="right" stroke="#fbbf24" fontSize={11} />
-                        <Tooltip />
-                        <Legend />
-                        <Bar yAxisId="left" dataKey="initial" name="Initial Claims" fill="#f43f5e" radius={[4, 4, 0, 0]} barSize={20} />
-                        <Line yAxisId="right" type="monotone" dataKey="continuing" name="Continuing Claims" stroke="#fbbf24" strokeWidth={3} dot={{ r: 5 }} />
+                      <ComposedChart data={claimsData} margin={{ top: 10, right: 30, left: 10, bottom: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                        <XAxis 
+                          dataKey="week" 
+                          stroke="#475569" 
+                          fontSize={10} 
+                          axisLine={false} 
+                          tickLine={false} 
+                          dy={10}
+                        />
+                        <YAxis 
+                          yAxisId="left" 
+                          stroke="#f43f5e" 
+                          fontSize={10} 
+                          axisLine={false} 
+                          tickLine={false}
+                          domain={[207, 219]}
+                          ticks={[207, 210, 213, 216, 219]}
+                        />
+                        <YAxis 
+                          yAxisId="right" 
+                          orientation="right" 
+                          stroke="#fbbf24" 
+                          fontSize={10} 
+                          axisLine={false} 
+                          tickLine={false}
+                          domain={[1880, 1920]}
+                          ticks={[1880, 1890, 1900, 1910, 1920]}
+                        />
+                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }} />
+                        <Legend align="center" verticalAlign="bottom" iconType="rect" wrapperStyle={{ paddingTop: '30px', fontSize: '10px', textTransform: 'none' }} />
+                        <Bar yAxisId="left" dataKey="initial" name="Initial Claims" fill="#991b1b" radius={[2, 2, 0, 0]} barSize={12} opacity={0.8} />
+                        <Line yAxisId="right" type="monotone" dataKey="continuing" name="Continuing Claims" stroke="#fbbf24" strokeWidth={3} dot={{ r: 4, fill: '#fbbf24' }} />
                       </ComposedChart>
                     </ResponsiveContainer>
                   </div>
@@ -488,20 +512,44 @@ const LaborAlphaDashboard = () => {
                 <div className="col-span-12 lg:col-span-6 glass-card-premium p-6">
                   <div className="flex justify-between items-center mb-1">
                     <h3 className="text-xl font-bold text-white font-display">Alt Data: Indeed Postings Index</h3>
-                    <div className="px-3 py-1 bg-violet-500/10 text-violet-500 text-[9px] font-bold rounded border border-violet-500/20 uppercase italic">Real-Time Lead</div>
+                    <div className="px-3 py-1 bg-violet-500/10 text-violet-500 text-[9px] font-bold rounded border border-violet-500/20 uppercase italic font-sans tracking-wide">Real-Time Lead</div>
                   </div>
                   <p className="text-slate-500 text-xs mb-12 italic">Index (100 = Pre-Pandemic) vs Hiring Momentum</p>
                   <div className="h-[400px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={indeedIndexData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="week" stroke="#475569" fontSize={11} />
-                        <YAxis yAxisId="left" stroke="#38bdf8" fontSize={11} />
-                        <YAxis yAxisId="right" orientation="right" stroke="#0ea5e9" fontSize={11} />
-                        <Tooltip />
-                        <Legend />
-                        <Bar yAxisId="left" dataKey="value" name="Indeed Postings Index" fill="#0369a1" radius={[4, 4, 0, 0]} barSize={40} />
-                        <Line yAxisId="right" type="monotone" dataKey="oscillator" name="Momentum Oscillator" stroke="#38bdf8" strokeWidth={3} dot={{ r: 5 }} />
+                      <ComposedChart data={indeedIndexData} margin={{ top: 10, right: 30, left: 10, bottom: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                        <XAxis 
+                          dataKey="week" 
+                          stroke="#475569" 
+                          fontSize={10} 
+                          axisLine={false} 
+                          tickLine={false} 
+                          dy={10}
+                        />
+                        <YAxis 
+                          yAxisId="left" 
+                          stroke="#38bdf8" 
+                          fontSize={10} 
+                          axisLine={false} 
+                          tickLine={false}
+                          domain={[100, 125]}
+                          ticks={[100, 107, 114, 125]}
+                        />
+                        <YAxis 
+                          yAxisId="right" 
+                          orientation="right" 
+                          stroke="#0ea5e9" 
+                          fontSize={10} 
+                          axisLine={false} 
+                          tickLine={false}
+                          domain={[-2.1, 2.1]}
+                          ticks={[-2.1, -1.05, 0, 1.05, 2.1]}
+                        />
+                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }} />
+                        <Legend align="center" verticalAlign="bottom" iconType="circle" wrapperStyle={{ paddingTop: '30px', fontSize: '10px', textTransform: 'none' }} />
+                        <Bar yAxisId="right" dataKey="oscillator" name="Momentum Oscillator" fill="#0369a1" radius={[2, 2, 2, 2]} barSize={45} />
+                        <Line yAxisId="left" type="monotone" dataKey="value" name="Indeed Postings Index" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4, fill: '#38bdf8' }} />
                       </ComposedChart>
                     </ResponsiveContainer>
                   </div>
