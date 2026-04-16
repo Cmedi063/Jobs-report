@@ -50,16 +50,20 @@ const LaborAlphaDashboard = () => {
     { month: 'Mar 26', Headline: 178, TrueTrend: 152, Distortion: 85 }
   ];
 
-  const sectorHierarchyData = [
-    { name: 'Healthcare', value: 75, color: '#14b8a6' },
-    { name: 'Construction', value: 25, color: '#f59e0b' },
-    { name: 'Transport/Logistics', value: 18, color: '#3b82f6' },
-    { name: 'Manufacturing', value: 12, color: '#8b5cf6' },
-    { name: 'Retail Trade', value: 8, color: '#06b6d4' },
-    { name: 'Information', value: -5, color: '#f43f5e' },
-    { name: 'Financial Activities', value: -12, color: '#e11d48' },
-    { name: 'Federal Govt', value: -18, color: '#9f1239' }
-  ].sort((a,b) => b.value - a.value);
+  const sectorMatrixData = [
+    { name: 'Healthcare', growth: 76, wage: 4.5, risk: 'Low', color: '#14b8a6' },
+    { name: 'Construction', growth: 26, wage: 3.8, risk: 'Med', color: '#f59e0b' },
+    { name: 'Financial Activities', growth: -18, wage: 3.1, risk: 'Med', color: '#3b82f6' },
+    { name: 'Manufacturing', growth: 15, wage: 3.2, risk: 'Med', color: '#8b5cf6' },
+    { name: 'Transport/Logistics', growth: 21, wage: 3.0, risk: 'Low', color: '#06b6d4' },
+    { name: 'Federal Govt', growth: -22, wage: 4.2, risk: 'High', color: '#f43f5e' },
+    { name: 'Information', growth: -5, wage: 2.8, risk: 'Med', color: '#e11d48' },
+    { name: 'Retail Trade', growth: 10, wage: 2.5, risk: 'Low', color: '#9f1239' }
+  ];
+
+  const sectorHierarchyData = [...sectorMatrixData]
+    .map(d => ({ name: d.name, value: d.growth, color: d.color }))
+    .sort((a,b) => b.value - a.value);
 
   const compositionData = [
     { month: 'Oct 25', fullTime: -120, partTime: 85 },
@@ -113,6 +117,31 @@ const LaborAlphaDashboard = () => {
     { name: 'Q4 25', realWage: 1.1, delinquency: 3.2 },
     { name: 'Q1 26', realWage: 0.9, delinquency: 3.5 }
   ];
+  const SectorTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      const data = payload[0].payload;
+      return (
+        <div className="glass-card-premium p-4 border border-white/10 shadow-2xl min-w-[180px]">
+          <h4 className="font-bold text-sm mb-2" style={{ color: data.color }}>{data.name}</h4>
+          <div className="space-y-1.5">
+            <div className="flex justify-between gap-4">
+              <span className="text-[10px] text-slate-500 font-bold uppercase">Jobs Added:</span>
+              <span className="text-[10px] text-white font-bold">{data.growth}K</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-[10px] text-slate-500 font-bold uppercase">Wage Growth:</span>
+              <span className="text-[10px] text-white font-bold">{data.wage}%</span>
+            </div>
+            <div className="flex justify-between gap-4">
+              <span className="text-[10px] text-slate-500 font-bold uppercase">Weather Risk:</span>
+              <span className="text-[10px] text-white font-bold">{data.risk}</span>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return null;
+  };
 
   const StatCard = ({ title, value, subtext, icon: Icon, colorClass }) => (
     <div className="stat-card-v2 group hover:ring-1 hover:ring-white/10 transition-all">
@@ -290,13 +319,36 @@ const LaborAlphaDashboard = () => {
                   <p className="text-slate-500 text-xs mb-12 italic">Identifying Stagflation vs. True Growth Areas</p>
                   <div className="h-[400px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis type="number" dataKey="value" name="Job Change" stroke="#475569" fontSize={11} axisLine={false} tickLine={false} unit="k" />
-                        <YAxis type="number" dataKey="value" name="Wage Pressure" stroke="#475569" fontSize={11} axisLine={false} tickLine={false} unit="%" />
-                        <ZAxis type="number" range={[100, 1000]} />
-                        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                        {sectorHierarchyData.map((entry, index) => (
+                      <ScatterChart margin={{ top: 20, right: 30, bottom: 20, left: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={true} horizontal={true} stroke="#1e293b" />
+                        <XAxis 
+                          type="number" 
+                          dataKey="growth" 
+                          name="Job Change" 
+                          stroke="#475569" 
+                          fontSize={11} 
+                          axisLine={false} 
+                          tickLine={false} 
+                          domain={[-30, 90]}
+                          ticks={[-30, 0, 30, 60, 90]}
+                        />
+                        <YAxis 
+                          type="number" 
+                          dataKey="wage" 
+                          name="Wage Pressure" 
+                          stroke="#475569" 
+                          fontSize={11} 
+                          axisLine={false} 
+                          tickLine={false} 
+                          domain={[-30, 90]} // Keep scale consistent with X if needed, or matched to screenshot
+                          ticks={[1.5, 2.4, 3.3, 4.2, 5.0]}
+                          domain={[1, 5.5]}
+                        />
+                        <ZAxis type="number" range={[150, 150]} />
+                        <Tooltip content={<SectorTooltip />} cursor={{ strokeDasharray: '3 3', stroke: '#334155' }} />
+                        <ReferenceLine x={0} stroke="#475569" strokeWidth={1} strokeDasharray="3 3" />
+                        <ReferenceLine y={4.2} stroke="#475569" strokeWidth={1} strokeDasharray="3 3" label={{ position: 'insideBottomLeft', value: 'Avg Wage Growth', fill: '#475569', fontSize: 10, offset: 10 }} />
+                        {sectorMatrixData.map((entry, index) => (
                           <Scatter key={index} name={entry.name} data={[entry]} fill={entry.color} />
                         ))}
                       </ScatterChart>
