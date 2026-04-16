@@ -1,57 +1,64 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-primary: hsl(220, 80%, 50%);
-  --color-brand-secondary: hsl(260, 80%, 60%);
-  --color-bg-deep: hsl(222, 47%, 11%);
-  --color-glass: rgba(255, 255, 255, 0.05);
-  --color-glass-border: rgba(255, 255, 255, 0.1);
+  --color-bg-primary: #040a12;
+  --color-bg-card: #0d1520;
+  --color-accent-teal: #14b8a6;
+  --color-accent-indigo: #6366f1;
+  --color-accent-rose: #f43f5e;
+  --color-accent-amber: #eab308;
+  --color-accent-violet: #8b5cf6;
 }
 
 @layer base {
   body {
-    @apply bg-[#0a0f1d] text-slate-200 antialiased min-h-screen;
-    background-image: 
-      radial-gradient(circle at 0% 0%, rgba(30, 41, 59, 0.4) 0%, transparent 50%),
-      radial-gradient(circle at 100% 100%, rgba(15, 23, 42, 0.4) 0%, transparent 50%);
+    @apply bg-bg-primary text-slate-300 antialiased min-h-screen overflow-x-hidden;
     font-family: 'Inter', system-ui, sans-serif;
   }
 }
 
-@utility glass-card {
-  @apply bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl shadow-xl transition-all duration-300;
-  
-  &:hover {
-    @apply border-white/20 shadow-brand-primary/10;
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.1);
+@utility glass-card-premium {
+  @apply bg-bg-card border border-white/5 rounded-xl shadow-2xl;
+}
+
+@utility stat-card-v2 {
+  @apply flex items-center justify-between p-4 glass-card-premium min-h-[100px];
+}
+
+@utility nav-btn-v2 {
+  @apply px-4 py-1.5 rounded-lg text-sm font-medium transition-all duration-200;
+}
+
+@utility nav-btn-active-v2 {
+  @apply bg-accent-indigo/20 text-white border border-accent-indigo/40 ring-1 ring-accent-indigo/20 shadow-[0_0_15px_rgba(99,102,241,0.2)];
+}
+
+@utility nav-btn-inactive-v2 {
+  @apply text-slate-400 hover:text-white hover:bg-white/5;
+}
+
+/* Custom Chart Styling */
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: #1e293b;
+  stroke-opacity: 0.5;
+}
+
+.recharts-default-tooltip {
+  @apply !bg-[#0f172a] !border-slate-800 !rounded-xl !shadow-2xl !p-3 !text-sm !font-sans;
+}
+
+.recharts-tooltip-label {
+  @apply !text-slate-400 !font-bold !mb-1;
+}
+
+.recharts-legend-item-text {
+  @apply !text-slate-400 !text-xs !font-medium;
+}
+
+/* Typography Utilities */
+@layer utilities {
+  .font-display {
+    font-family: 'Outfit', sans-serif;
   }
-}
-
-@utility stat-card {
-  @apply glass-card p-6 flex flex-col gap-2;
-}
-
-@utility nav-btn {
-  @apply px-4 py-2 rounded-lg transition-all flex items-center gap-2 text-sm font-medium;
-}
-
-@utility nav-btn-active {
-  @apply bg-blue-600/20 text-blue-400 border border-blue-500/50;
-}
-
-@utility nav-btn-inactive {
-  @apply text-slate-400 hover:bg-white/5 hover:text-white;
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  @apply bg-transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  @apply bg-slate-700/50 rounded-full hover:bg-slate-600/50;
 }

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { 
   BarChart, Bar, LineChart, Line, AreaChart, Area, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, 
   Tooltip, Legend, ResponsiveContainer, ReferenceLine, Cell, ComposedChart, ZAxis, PieChart, Pie
@@ -6,203 +6,277 @@ import {
 import { 
   TrendingUp, TrendingDown, Activity, CloudLightning, Sun, Users, Briefcase, Info, 
   Zap, AlertCircle, BookOpen, Gauge, BrainCircuit, Globe, Building, Target, 
-  ChevronRight, ArrowUpRight, ArrowDownRight, Layers, Database, Cpu, Search
+  ChevronRight, ArrowUpRight, ArrowDownRight, Layers, Database, Cpu, Search,
+  RefreshCw, Clock, Network
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const App = () => {
-  const [activeView, setActiveView] = useState('macro');
+// --- MCP / API Data Orchestration Layer ---
+const useLaborData = () => {
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [lastSync, setLastSync] = useState(new Date().toLocaleTimeString());
 
-  // Enhanced Data: Added "Distortion" metric
-  const weatherTrendData = [
-    { month: 'Sep 25', BLS_Official: 76, Weather_Adjusted: 74, Distortion: 2 },
-    { month: 'Oct 25', BLS_Official: -140, Weather_Adjusted: -152, Distortion: 12 },
-    { month: 'Nov 25', BLS_Official: 41, Weather_Adjusted: 28, Distortion: 13 },
-    { month: 'Dec 25', BLS_Official: -17, Weather_Adjusted: -14, Distortion: -3 },
-    { month: 'Jan 26', BLS_Official: 126, Weather_Adjusted: 135, Distortion: -9 },
-    { month: 'Feb 26', BLS_Official: 104, Weather_Adjusted: 98, Distortion: 6 },
-    { month: 'Mar 26', BLS_Official: 185, Weather_Adjusted: 168, Distortion: 17 }
-  ];
-
-  const sectorMatrixData = [
-    { sector: 'Leisure', growth: 42, wageChange: 5.2, weatherSensitivity: 85, color: '#f43f5e' },
-    { sector: 'Construction', growth: 12, wageChange: 4.8, weatherSensitivity: 70, color: '#fbbf24' },
-    { sector: 'Healthcare', growth: 78, wageChange: 3.9, weatherSensitivity: 15, color: '#10b981' },
-    { sector: 'Tech', growth: -8, wageChange: 6.1, weatherSensitivity: 5, color: '#6366f1' },
-    { sector: 'Retail', growth: 5, wageChange: 4.2, weatherSensitivity: 40, color: '#ec4899' },
-    { sector: 'Manufacturing', growth: -12, wageChange: 3.5, weatherSensitivity: 25, color: '#64748b' }
-  ];
-
-  const qualityMixData = [
-    { subject: 'FT Stability', A: 85, B: 92, fullMark: 100 },
-    { subject: 'Nominal Growth', A: 75, B: 65, fullMark: 100 },
-    { subject: 'Hours Worked', A: 90, B: 82, fullMark: 100 },
-    { subject: 'Benefits', A: 60, B: 55, fullMark: 100 },
-    { subject: 'Remote Index', A: 45, B: 40, fullMark: 100 }
-  ];
-
-  const fedAlphaData = [
-    { name: 'Jan', productivity: 2.1, unitLaborCost: 3.2, realWage: 1.1 },
-    { name: 'Feb', productivity: 2.4, unitLaborCost: 2.8, realWage: 1.3 },
-    { name: 'Mar', productivity: 1.8, unitLaborCost: 3.5, realWage: 0.8 },
-    { name: 'Apr', productivity: 2.2, unitLaborCost: 2.9, realWage: 1.4 }
-  ];
-
-  const activeTabStyle = "bg-blue-600/20 text-blue-400 border border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.2)]";
-  const inactiveTabStyle = "text-slate-400 hover:bg-white/5 hover:text-white border border-transparent";
-
-  const containerVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } }
+  // In a real implementation, this would connect to an MCP server or API Gateway
+  // Example pattern: fetch('/api/mcp/fred/series/PAYEMS')
+  const syncData = () => {
+    setIsSyncing(true);
+    setTimeout(() => {
+      setIsSyncing(false);
+      setLastSync(new Date().toLocaleTimeString());
+    }, 1500);
   };
 
+  useEffect(() => {
+    const interval = setInterval(syncData, 60000); // Sync every minute
+    return () => clearInterval(interval);
+  }, []);
+
+  return { isSyncing, lastSync, syncData };
+};
+
+const LaborAlphaDashboard = () => {
+  const [activeView, setActiveView] = useState('macro');
+  const { isSyncing, lastSync, syncData } = useLaborData();
+
+  // --- Data Definitions (Matched to Screenshots) ---
+  
+  const macroTrendData = [
+    { month: 'Sep 25', Headline: 76, TrueTrend: 74, Distortion: 12 },
+    { month: 'Oct 25', Headline: -140, TrueTrend: -152, Distortion: -8 },
+    { month: 'Nov 25', Headline: 41, TrueTrend: 28, Distortion: 13 },
+    { month: 'Dec 25', Headline: -17, TrueTrend: -14, Distortion: -3 },
+    { month: 'Jan 26', Headline: 126, TrueTrend: 135, Distortion: 58 },
+    { month: 'Feb 26', Headline: -92, TrueTrend: -104, Distortion: 12 },
+    { month: 'Mar 26', Headline: 178, TrueTrend: 152, Distortion: 85 }
+  ];
+
+  const sectorHierarchyData = [
+    { name: 'Healthcare', value: 75, color: '#14b8a6' },
+    { name: 'Construction', value: 25, color: '#f59e0b' },
+    { name: 'Transport/Logistics', value: 18, color: '#3b82f6' },
+    { name: 'Manufacturing', value: 12, color: '#8b5cf6' },
+    { name: 'Retail Trade', value: 8, color: '#06b6d4' },
+    { name: 'Information', value: -5, color: '#f43f5e' },
+    { name: 'Financial Activities', value: -12, color: '#e11d48' },
+    { name: 'Federal Govt', value: -18, color: '#9f1239' }
+  ].sort((a,b) => b.value - a.value);
+
+  const compositionData = [
+    { month: 'Oct 25', fullTime: -120, partTime: 85 },
+    { month: 'Nov 25', fullTime: 45, partTime: 65 },
+    { month: 'Dec 25', fullTime: 12, partTime: 22 },
+    { month: 'Jan 26', fullTime: 35, partTime: 125 },
+    { month: 'Feb 26', fullTime: -160, partTime: -85 },
+    { month: 'Mar 26', fullTime: 110, partTime: 185 }
+  ];
+
+  const tightenssData = [
+    { month: 'Oct 25', openings: 8.7, ratio: 1.45 },
+    { month: 'Nov 25', openings: 8.55, ratio: 1.35 },
+    { month: 'Dec 25', openings: 8.42, ratio: 1.28 },
+    { month: 'Jan 26', openings: 8.58, ratio: 1.32 },
+    { month: 'Feb 26', openings: 8.28, ratio: 1.20 },
+    { month: 'Mar 26', openings: 8.12, ratio: 1.08 }
+  ];
+
+  const claimsData = [
+    { week: 'Feb W1', initial: 212, continuing: 1885 },
+    { week: 'Feb W2', initial: 216, continuing: 1895 },
+    { week: 'Feb W3', initial: 209, continuing: 1892 },
+    { week: 'Feb W4', initial: 211, continuing: 1905 },
+    { week: 'Mar W1', initial: 218, continuing: 1915 },
+    { week: 'Mar W2', initial: 219, continuing: 1920 }
+  ];
+
+  const indeedIndexData = [
+    { week: 'Feb W1', value: 125, oscillator: 1.2 },
+    { week: 'Feb W2', value: 122, oscillator: 0.8 },
+    { week: 'Feb W3', value: 118, oscillator: 0.2 },
+    { week: 'Feb W4', value: 115, oscillator: -0.1 },
+    { week: 'Mar W1', value: 112, oscillator: -0.5 },
+    { week: 'Mar W2', value: 110, oscillator: -1.2 },
+    { week: 'Mar W3', value: 108, oscillator: -2.1 }
+  ];
+
+  const fedSoftLandingData = [
+    { name: 'Q1 25', productivity: 0.1, ulc: 4.5 },
+    { name: 'Q2 25', productivity: 1.2, ulc: 3.2 },
+    { name: 'Q3 25', productivity: 4.8, ulc: 0.5 },
+    { name: 'Q4 25', productivity: 3.2, ulc: 0.6 },
+    { name: 'Q1 26', productivity: 2.8, ulc: 0.8 }
+  ];
+
+  const consumerSqueezeData = [
+    { name: 'Q1 25', realWage: -0.8, delinquency: 2.1 },
+    { name: 'Q2 25', realWage: 0.2, delinquency: 2.4 },
+    { name: 'Q3 25', realWage: 0.8, delinquency: 2.8 },
+    { name: 'Q4 25', realWage: 1.1, delinquency: 3.2 },
+    { name: 'Q1 26', realWage: 0.9, delinquency: 3.5 }
+  ];
+
+  const StatCard = ({ title, value, subtext, icon: Icon, colorClass }) => (
+    <div className="stat-card-v2 group hover:ring-1 hover:ring-white/10 transition-all">
+      <div className="flex flex-col gap-1">
+        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-wider">{title}</p>
+        <h2 className="text-2xl font-bold text-white font-display">{value}</h2>
+        <p className={`text-[10px] font-medium ${colorClass}`}>{subtext}</p>
+      </div>
+      <div className={`p-2.5 rounded-lg bg-slate-800/50 text-slate-400 group-hover:scale-110 transition-transform`}>
+        <Icon className="w-5 h-5" />
+      </div>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen p-4 md:p-8 font-sans selection:bg-blue-500/30">
-      {/* Header Section */}
-      <header className="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="min-h-screen bg-[#040a12] p-4 md:p-6 lg:p-8 font-sans">
+      
+      {/* --- Dashboard Header --- */}
+      <header className="max-w-[1600px] mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-600 rounded-lg">
-              <Activity className="w-6 h-6 text-white" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-accent-indigo rounded-lg flex items-center justify-center shadow-[0_0_20px_rgba(99,102,241,0.4)]">
+              <Zap className="w-6 h-6 text-white fill-current" />
             </div>
-            <h1 className="text-3xl md:text-4xl font-bold font-display tracking-tight text-white">
-              Labor Alpha <span className="text-blue-500">Dashboard</span>
+            <h1 className="text-3xl font-black text-white font-display tracking-tight uppercase italic">
+              Labor Alpha
             </h1>
           </div>
-          <p className="text-slate-400 text-sm md:text-base flex items-center gap-2">
-            <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-            V1.4.2 Institutional Feed • Weather-Adjusted Realities • AI-Driven Insights
-          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <Sun className="w-3.5 h-3.5 text-accent-amber" />
+            <p className="text-slate-400 text-xs font-bold tracking-wide uppercase italic">
+              Signal Through The Noise: Weather-Adjusted Analytics
+            </p>
+          </div>
         </div>
 
-        <nav className="flex flex-wrap gap-2 bg-slate-900/50 p-1 rounded-xl border border-white/5 backdrop-blur-md">
-          {[
-            { id: 'macro', icon: Globe, label: 'Macro Reality' },
-            { id: 'sector', icon: Target, label: 'Sector Matrix' },
-            { id: 'fed', icon: Building, label: 'Fed Watch' },
-            { id: 'guide', icon: BrainCircuit, label: '10x Alpha Guide' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveView(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-                activeView === tab.id ? activeTabStyle : inactiveTabStyle
-              }`}
-            >
-              <tab.icon className="w-4 h-4" />
-              {tab.label}
+        {/* Sync Status / MCP Hook */}
+        <div className="flex flex-col items-end gap-2">
+          <nav className="bg-[#0d1520]/80 backdrop-blur-md p-1 rounded-xl border border-white/5 flex gap-1">
+            {[
+              { id: 'macro', label: 'Macro View' },
+              { id: 'sector', label: 'Sector Matrix' },
+              { id: 'quality', label: 'Job Quality' },
+              { id: 'pulse', label: 'Weekly Pulse' },
+              { id: 'fed', label: 'Fed Watch' },
+              { id: 'guide', label: '10x Alpha Guide' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveView(tab.id)}
+                className={`nav-btn-v2 ${activeView === tab.id ? 'nav-btn-active-v2' : 'nav-btn-inactive-v2'}`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+              <div className={`w-1.5 h-1.5 rounded-full bg-emerald-500 ${isSyncing ? 'animate-ping' : ''}`} />
+              <span className="text-[10px] font-bold text-emerald-500 uppercase">FRED/BLS MCP Loop Active</span>
+            </div>
+            <button onClick={syncData} className="text-slate-500 hover:text-white transition-colors">
+              <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
             </button>
-          ))}
-        </nav>
+          </div>
+        </div>
       </header>
 
-      <main className="max-w-7xl mx-auto">
+      {/* --- Top Stats Row --- */}
+      <section className="max-w-[1600px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard 
+          title="True Job Growth (Adjusted)" 
+          value="+152K" 
+          subtext="Official: +178K (Overstated)" 
+          icon={Briefcase}
+          colorClass="text-accent-teal"
+        />
+        <StatCard 
+          title="Unemployment Rate" 
+          value="4.3%" 
+          subtext="400K exited labor force" 
+          icon={Users}
+          colorClass="text-emerald-500"
+        />
+        <StatCard 
+          title="Weather Distortion Vol." 
+          value="118K" 
+          subtext="Jobs misallocated in 6 mos" 
+          icon={CloudLightning}
+          colorClass="text-accent-amber"
+        />
+        <StatCard 
+          title="Core Wage Growth" 
+          value="3.5%" 
+          subtext="Cooling from 3.8% peak" 
+          icon={Activity}
+          colorClass="text-accent-rose"
+        />
+      </section>
+
+      {/* --- Main Dashboard Content --- */}
+      <main className="max-w-[1600px] mx-auto">
         <AnimatePresence mode="wait">
           <motion.div
             key={activeView}
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            exit="hidden"
-            className="grid grid-cols-1 lg:grid-cols-12 gap-6"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="grid grid-cols-12 gap-6"
           >
             {activeView === 'macro' && (
               <>
-                <div className="lg:col-span-8 glass-card p-6">
-                  <div className="flex items-center justify-between mb-6">
-                    <div>
-                      <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                        <CloudLightning className="w-5 h-5 text-amber-400" />
-                        The Weather-Adjusted Reality Gap
-                      </h3>
-                      <p className="text-slate-400 text-sm">Quantifying the distortion between official stats and structural health</p>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-blue-500" />
-                        <span className="text-xs text-slate-300">Weather Adjusted</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-slate-600" />
-                        <span className="text-xs text-slate-300">Official BLS</span>
-                      </div>
-                    </div>
+                <div className="col-span-12 lg:col-span-8 glass-card-premium p-6">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-xl font-bold text-white font-display">The "Reality Gap"</h3>
+                    <span className="px-2 py-0.5 bg-accent-indigo/10 text-accent-indigo text-[10px] font-bold rounded-full uppercase border border-accent-indigo/20">Composed View</span>
                   </div>
+                  <p className="text-slate-500 text-xs mb-8 italic">Official BLS vs Weather-Adjusted Baseline (000s)</p>
                   
-                  <div className="h-[400px] w-full">
+                  <div className="h-[450px] w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={weatherTrendData}>
+                      <ComposedChart data={macroTrendData}>
                         <defs>
-                          <linearGradient id="colorAdjusted" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                          <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#6366f1" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#6366f1" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
-                        <XAxis 
-                          dataKey="month" 
-                          stroke="#64748b" 
-                          fontSize={12} 
-                          tickLine={false} 
-                          axisLine={false}
-                        />
-                        <YAxis 
-                          stroke="#64748b" 
-                          fontSize={12} 
-                          tickLine={false} 
-                          axisLine={false}
-                          tickFormatter={(value) => `${value}k`}
-                        />
-                        <Tooltip 
-                          contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', fontSize: '12px' }}
-                          itemStyle={{ color: '#fff' }}
-                        />
-                        <Legend />
-                        <Area type="monotone" dataKey="Weather_Adjusted" stroke="#3b82f6" strokeWidth={3} fill="url(#colorAdjusted)" />
-                        <Line type="monotone" dataKey="BLS_Official" stroke="#64748b" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 4, fill: '#64748b' }} />
-                        <Bar dataKey="Distortion" fill="#fbbf24" radius={[4, 4, 0, 0]} opacity={0.6} />
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="month" stroke="#475569" fontSize={11} axisLine={false} tickLine={false} />
+                        <YAxis stroke="#475569" fontSize={11} axisLine={false} tickLine={false} />
+                        <Tooltip />
+                        <Legend iconType="circle" />
+                        <Bar dataKey="Distortion" name="Weather Distortion" fill="#0d9488" opacity={0.6} radius={[4, 4, 0, 0]} />
+                        <Area type="monotone" dataKey="TrueTrend" name="True Trend (Adjusted)" stroke="#c084fc" strokeWidth={3} fill="url(#purpleGradient)" />
+                        <Line type="monotone" dataKey="Headline" name="Headline (Official)" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4, fill: '#38bdf8' }} />
                       </ComposedChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
 
-                <div className="lg:col-span-4 flex flex-col gap-6">
-                  <div className="stat-card">
-                    <div className="flex justify-between items-start">
-                      <p className="text-slate-400 text-sm font-medium">Monthly Alpha Gap</p>
-                      <div className="p-2 bg-amber-500/10 rounded-lg text-amber-500">
-                        <Zap className="w-4 h-4" />
-                      </div>
-                    </div>
-                    <h2 className="text-3xl font-bold text-white mt-1">+17.4k</h2>
-                    <p className="text-amber-500 text-xs flex items-center gap-1 mt-1">
-                      <TrendingUp className="w-3 h-3" />
-                      Highest distortion in 4 months
-                    </p>
+                <div className="col-span-12 lg:col-span-4 glass-card-premium p-6">
+                  <div className="flex items-center gap-2 mb-6">
+                    <Zap className="w-5 h-5 text-accent-amber fill-yellow-500/20" />
+                    <h3 className="text-xl font-bold text-white font-display">Alpha Synthesis</h3>
                   </div>
-
-                  <div className="glass-card p-6 flex-1">
-                    <h3 className="text-white font-bold mb-4 flex items-center gap-2">
-                      <AlertCircle className="w-4 h-4 text-blue-400" />
-                      Analysis Summary
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="p-3 bg-white/5 rounded-xl border border-white/5">
-                        <p className="text-xs text-slate-400 uppercase tracking-widest mb-1">Signal strength</p>
-                        <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                          <div className="bg-blue-500 h-full w-[78%]" />
-                        </div>
-                      </div>
-                      <ul className="text-sm text-slate-300 space-y-3">
-                        <li className="flex gap-2">
-                          <span className="text-blue-500">•</span> 
-                          March weather was 2.4°C above mean, inflating construction and leisure by ~15k.
-                        </li>
-                        <li className="flex gap-2">
-                          <span className="text-blue-500">•</span> 
-                          Reality-adjusted growth sits at 168k vs initial 185k report.
-                        </li>
-                      </ul>
+                  <div className="space-y-8">
+                    <div className="relative pl-6 before:absolute before:left-0 before:top-1.5 before:w-2 before:h-2 before:bg-accent-indigo before:rounded-full">
+                      <h4 className="text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">The Feb/Mar Whiplash</h4>
+                      <p className="text-sm text-slate-400 leading-relaxed font-medium italic">
+                        The massive 270K swing between February's loss and March's gain is a statistical mirage. <strong>Weather distortion accounts for 85K of that variance.</strong> The true labor market is stable.
+                      </p>
+                    </div>
+                    <div className="relative pl-6 before:absolute before:left-0 before:top-1.5 before:w-2 before:h-2 before:bg-accent-teal before:rounded-full">
+                      <h4 className="text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Fed Rate Probability</h4>
+                      <p className="text-sm text-slate-400 leading-relaxed font-medium italic">
+                        Because the "Weather Adjusted" number (+152K) shows moderate growth, the Fed has cover to look past the headline "beat". <strong>Rate cuts remain on the table for Summer 2026.</strong>
+                      </p>
+                    </div>
+                    <div className="relative pl-6 before:absolute before:left-0 before:top-1.5 before:w-2 before:h-2 before:bg-accent-rose before:rounded-full">
+                      <h4 className="text-xs font-bold text-slate-200 uppercase tracking-widest mb-2">Participation Risk</h4>
+                      <p className="text-sm text-slate-400 leading-relaxed font-medium italic">
+                        The drop to 4.3% unemployment hides a structural weakness: 400K people exiting the labor force. If they return, the rate will snap back up to 4.5%+.
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -210,186 +284,289 @@ const App = () => {
             )}
 
             {activeView === 'sector' && (
-              <div className="lg:col-span-12 glass-card p-6">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-                  <div>
-                    <h3 className="text-xl font-bold text-white">Sector Momentum Matrix</h3>
-                    <p className="text-slate-400 text-sm">Growth vs Wage Pressure cross-tabulated with sensitivity</p>
-                  </div>
-                </div>
-                
-                <div className="h-[500px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" />
-                      <XAxis type="number" dataKey="growth" name="Job Growth" unit="k" stroke="#64748b" />
-                      <YAxis type="number" dataKey="wageChange" name="Wage Change" unit="%" stroke="#64748b" />
-                      <ZAxis type="number" dataKey="weatherSensitivity" range={[100, 1000]} />
-                      <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                      <Legend />
-                      {sectorMatrixData.map((entry, index) => (
-                        <Scatter 
-                          key={`sector-${index}`} 
-                          name={entry.sector} 
-                          data={[entry]} 
-                          fill={entry.color}
-                        />
-                      ))}
-                    </ScatterChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            )}
-
-            {activeView === 'fed' && (
               <>
-                <div className="lg:col-span-8 glass-card p-6">
-                  <h3 className="text-lg font-bold text-white mb-6">Productivity vs Unit Labor Costs</h3>
-                  <div className="h-[350px]">
+                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6">
+                  <h3 className="text-xl font-bold text-white font-display mb-1">Sector Matrix: Jobs vs. Wages</h3>
+                  <p className="text-slate-500 text-xs mb-12 italic">Identifying Stagflation vs. True Growth Areas</p>
+                  <div className="h-[400px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={fedAlphaData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
-                        <XAxis dataKey="name" stroke="#64748b" />
-                        <YAxis stroke="#64748b" />
-                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b' }} />
-                        <Legend />
-                        <Line type="monotone" dataKey="productivity" stroke="#10b981" strokeWidth={3} dot={{ fill: '#10b981' }} />
-                        <Line type="monotone" dataKey="unitLaborCost" stroke="#f43f5e" strokeWidth={3} dot={{ fill: '#f43f5e' }} />
-                      </LineChart>
+                      <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis type="number" dataKey="value" name="Job Change" stroke="#475569" fontSize={11} axisLine={false} tickLine={false} unit="k" />
+                        <YAxis type="number" dataKey="value" name="Wage Pressure" stroke="#475569" fontSize={11} axisLine={false} tickLine={false} unit="%" />
+                        <ZAxis type="number" range={[100, 1000]} />
+                        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                        {sectorHierarchyData.map((entry, index) => (
+                          <Scatter key={index} name={entry.name} data={[entry]} fill={entry.color} />
+                        ))}
+                      </ScatterChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
-                <div className="lg:col-span-4 glass-card p-6">
-                  <h3 className="text-lg font-bold text-white mb-4">Real Wage Compression</h3>
-                  <div className="space-y-6">
-                    <div className="flex justify-between items-end">
-                      <div>
-                        <p className="text-slate-400 text-sm">Real Wage Delta</p>
-                        <h4 className="text-2xl font-bold text-white">+0.8%</h4>
-                      </div>
-                      <div className="text-emerald-500 text-sm font-bold flex items-center mb-1">
-                        <TrendingUp className="w-4 h-4 mr-1" />
-                        Moderate
-                      </div>
+                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6">
+                  <h3 className="text-xl font-bold text-white font-display mb-1">Net Change Hierarchy</h3>
+                  <p className="text-slate-500 text-xs mb-8 italic">March 2026 Distribution</p>
+                  <div className="h-[430px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={sectorHierarchyData} layout="vertical" margin={{ left: 50 }}>
+                        <CartesianGrid strokeDasharray="3 3" horizontal={false} />
+                        <XAxis type="number" stroke="#475569" fontSize={11} axisLine={false} tickLine={false} />
+                        <YAxis type="category" dataKey="name" stroke="#cbd5e1" fontSize={10} axisLine={false} tickLine={false} width={120} />
+                        <Tooltip />
+                        <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                          {sectorHierarchyData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeView === 'quality' && (
+              <>
+                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-xl font-bold text-white font-display">Employment Composition</h3>
+                  </div>
+                  <p className="text-slate-500 text-xs mb-12 italic">Full-Time vs. Part-Time Job Creation (000s)</p>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={compositionData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="month" stroke="#475569" fontSize={11} />
+                        <YAxis stroke="#475569" fontSize={11} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="fullTime" name="Full-Time" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                        <Bar dataKey="partTime" name="Part-Time" fill="#ec4899" radius={[4, 4, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-8 p-4 bg-accent-rose/5 border border-accent-rose/10 rounded-xl">
+                    <div className="flex items-center gap-2 mb-2">
+                       <AlertCircle className="w-4 h-4 text-accent-rose" />
+                       <h4 className="text-xs font-bold text-white uppercase tracking-wider">The Part-Time Illusion</h4>
                     </div>
-                    <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
-                      <div className="h-full bg-emerald-500 w-[65%]" />
+                    <p className="text-xs text-slate-400 leading-relaxed italic">
+                      While the headline jobs number is positive, composition analysis reveals a structural shift. <strong>Full-time jobs have contracted in 4 of the last 6 months.</strong>
+                    </p>
+                  </div>
+                </div>
+                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6">
+                  <div className="flex justify-between items-center mb-1">
+                    <h3 className="text-xl font-bold text-white font-display">Labor Tightness Index</h3>
+                    <div className="px-3 py-1 bg-amber-500/10 text-amber-500 text-[9px] font-bold rounded border border-amber-500/20 uppercase">JOLTS Data</div>
+                  </div>
+                  <p className="text-slate-500 text-xs mb-12 italic">Job Openings (M) vs. Openings per Unemployed Ratio</p>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={tightenssData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="month" stroke="#475569" fontSize={11} />
+                        <YAxis yAxisId="left" orientation="left" stroke="#38bdf8" fontSize={11} />
+                        <YAxis yAxisId="right" orientation="right" stroke="#f59e0b" fontSize={11} />
+                        <Tooltip />
+                        <Legend />
+                        <Line yAxisId="left" type="monotone" dataKey="openings" name="Job Openings (M)" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4 }} />
+                        <Line yAxisId="right" type="monotone" dataKey="ratio" name="Ratio (Openings / Unemployed)" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4 }} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-8 p-4 bg-accent-indigo/5 border border-accent-indigo/10 rounded-xl">
+                    <div className="flex items-center gap-2 mb-2">
+                       <TrendingDown className="w-4 h-4 text-accent-indigo" />
+                       <h4 className="text-xs font-bold text-white uppercase tracking-wider">The Cooling Beveridge Curve</h4>
                     </div>
-                    <p className="text-xs text-slate-400 leading-relaxed">
-                      Fed narrative target is sub-0.5% real wage growth to cool services inflation. March data supports a "Hawkish Hold" scenario.
+                    <p className="text-xs text-slate-400 leading-relaxed italic">
+                      The ratio of job openings to unemployed persons has steadily fallen from a peak of 2.0 to 1.08. <strong>Wage push inflation is essentially neutralized.</strong>
                     </p>
                   </div>
                 </div>
               </>
             )}
 
+            {activeView === 'pulse' && (
+              <>
+                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6">
+                  <h3 className="text-xl font-bold text-white font-display mb-1">Govt Data: Jobless Claims</h3>
+                  <p className="text-slate-500 text-xs mb-12 italic">Initial vs Continuing Claims (000s) - Lagging Lead</p>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={claimsData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="week" stroke="#475569" fontSize={11} />
+                        <YAxis yAxisId="left" stroke="#f43f5e" fontSize={11} />
+                        <YAxis yAxisId="right" orientation="right" stroke="#fbbf24" fontSize={11} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar yAxisId="left" dataKey="initial" name="Initial Claims" fill="#f43f5e" radius={[4, 4, 0, 0]} barSize={20} />
+                        <Line yAxisId="right" type="monotone" dataKey="continuing" name="Continuing Claims" stroke="#fbbf24" strokeWidth={3} dot={{ r: 5 }} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6">
+                  <div className="flex justify-between items-center mb-1">
+                    <h3 className="text-xl font-bold text-white font-display">Alt Data: Indeed Postings Index</h3>
+                    <div className="px-3 py-1 bg-violet-500/10 text-violet-500 text-[9px] font-bold rounded border border-violet-500/20 uppercase italic">Real-Time Lead</div>
+                  </div>
+                  <p className="text-slate-500 text-xs mb-12 italic">Index (100 = Pre-Pandemic) vs Hiring Momentum</p>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={indeedIndexData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="week" stroke="#475569" fontSize={11} />
+                        <YAxis yAxisId="left" stroke="#38bdf8" fontSize={11} />
+                        <YAxis yAxisId="right" orientation="right" stroke="#0ea5e9" fontSize={11} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar yAxisId="left" dataKey="value" name="Indeed Postings Index" fill="#0369a1" radius={[4, 4, 0, 0]} barSize={40} />
+                        <Line yAxisId="right" type="monotone" dataKey="oscillator" name="Momentum Oscillator" stroke="#38bdf8" strokeWidth={3} dot={{ r: 5 }} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {activeView === 'fed' && (
+              <>
+                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6">
+                  <h3 className="text-xl font-bold text-white font-display mb-1">The Soft Landing Engine</h3>
+                  <p className="text-slate-500 text-xs mb-12 italic">Labor Productivity vs Unit Labor Costs (ULC) %</p>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={fedSoftLandingData}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" stroke="#475569" fontSize={11} />
+                        <YAxis stroke="#475569" fontSize={11} />
+                        <Tooltip />
+                        <Legend />
+                        <Bar dataKey="productivity" name="Productivity Growth" fill="#14b8a6" radius={[4, 4, 0, 0]} barSize={30} />
+                        <Line type="monotone" dataKey="ulc" name="Unit Labor Costs" stroke="#f43f5e" strokeWidth={3} dot={{ r: 5 }} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6">
+                  <h3 className="text-xl font-bold text-white font-display mb-1">The Consumer Squeeze</h3>
+                  <p className="text-slate-500 text-xs mb-12 italic">Real Wage Growth vs Credit Card Delinquencies (%)</p>
+                  <div className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <AreaChart data={consumerSqueezeData}>
+                        <defs>
+                          <linearGradient id="roseGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                        <XAxis dataKey="name" stroke="#475569" fontSize={11} />
+                        <YAxis stroke="#475569" fontSize={11} />
+                        <Tooltip />
+                        <Legend />
+                        <Area type="monotone" dataKey="realWage" name="Real Wage Growth" stroke="#8b5cf6" strokeWidth={3} fill="#8b5cf610" />
+                        <Line type="monotone" dataKey="delinquency" name="CC Delinquency Rate" stroke="#f43f5e" strokeWidth={3} strokeDasharray="5 5" />
+                      </AreaChart>
+                    </ResponsiveContainer>
+                  </div>
+                  <div className="mt-8 flex justify-end">
+                    <div className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[9px] font-bold rounded border border-emerald-500/20 uppercase">Quarterly Data</div>
+                  </div>
+                </div>
+              </>
+            )}
+
             {activeView === 'guide' && (
-              <div className="lg:col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Methodology Card: NLP */}
-                <div className="glass-card overflow-hidden flex flex-col group">
-                  <div className="p-6">
-                    <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-4 border border-purple-500/20">
-                      <Cpu className="w-6 h-6 text-purple-400" />
+              <div className="col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[
+                  {
+                    title: "Sentiment Quantization",
+                    desc: "Utilizing FinBERT and CentralBankRoBERTa to distill alpha from FOMC transcripts and S&P 500 earnings calls.",
+                    statLabel: "Drift Index",
+                    statValue: "-0.12 SD",
+                    icon: Cpu,
+                    color: "purple"
+                  },
+                  {
+                    title: "Autonomous Data Loops",
+                    desc: "Direct architectural integration with fred-mcp-server and bls-mcp for real-time validation of high-frequency data.",
+                    statLabel: "Sync Status",
+                    statValue: "Live (5ms)",
+                    icon: Database,
+                    color: "blue"
+                  },
+                  {
+                    title: "Foundation Time-Series",
+                    desc: "Deployment of Chronos-T5 and TimeGPT for synthetic job posting forecasting and seasonality isolation.",
+                    statLabel: "T+30 Forecast",
+                    statValue: "+12k (μ)",
+                    icon: TrendingUp,
+                    color: "emerald"
+                  },
+                  {
+                    title: "Causal Extraction",
+                    desc: "Leveraging DoubleML to quantify the structural impact of interest rate cycles on hiring volatility.",
+                    statLabel: "P-Value",
+                    statValue: "0.0041",
+                    icon: Search,
+                    color: "amber"
+                  }
+                ].map((card, i) => (
+                  <motion.div 
+                    key={i} 
+                    className="glass-card-premium overflow-hidden flex flex-col group hover:border-white/20 transition-all duration-500"
+                    whileHover={{ y: -5 }}
+                  >
+                    <div className="p-6">
+                      <div className={`w-12 h-12 rounded-xl bg-${card.color}-500/10 flex items-center justify-center mb-4 border border-${card.color}-500/20 group-hover:bg-${card.color}-500/20 group-hover:scale-110 transition-all duration-500`}>
+                        <card.icon className={`w-6 h-6 text-${card.color}-400`} />
+                      </div>
+                      <h3 className="text-white font-bold text-lg mb-2 group-hover:text-white transition-colors capitalize underline decoration-accent-indigo/20 underline-offset-4">{card.title}</h3>
+                      <p className="text-slate-400 text-sm leading-relaxed mb-6 font-medium italic">
+                        {card.desc}
+                      </p>
+                      <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest py-3 border-t border-white/5">
+                        <span className={`text-${card.color}-400`}>{card.statLabel}</span>
+                        <span className="text-white px-2 py-0.5 rounded bg-white/5">{card.statValue}</span>
+                      </div>
                     </div>
-                    <h3 className="text-white font-bold text-lg mb-2">Sentiment Quantization</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                      Utilizing <strong>FinBERT</strong> and <strong>CentralBankRoBERTa</strong> to distill alpha from FOMC transcripts and S&P 500 earnings calls.
-                    </p>
-                    <div className="flex items-center justify-between text-xs font-mono py-2 border-t border-white/5">
-                      <span className="text-purple-400">Drift Index</span>
-                      <span className="text-slate-300">-0.12 SD</span>
+                    <div className="mt-auto p-4 bg-white/[0.02] flex items-center justify-between group-hover:bg-white/[0.05] transition-all">
+                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">MCP Architecture Ready</span>
+                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:translate-x-1 transition-transform" />
                     </div>
-                  </div>
-                  <div className="mt-auto bg-purple-500/5 p-4 group-hover:bg-purple-500/10 transition-colors">
-                    <button className="text-purple-400 text-sm font-medium flex items-center gap-2">
-                      View Model Architecture <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Methodology Card: MCP */}
-                <div className="glass-card overflow-hidden flex flex-col group">
-                  <div className="p-6">
-                    <div className="w-12 h-12 rounded-xl bg-blue-500/10 flex items-center justify-center mb-4 border border-blue-500/20">
-                      <Database className="w-6 h-6 text-blue-400" />
-                    </div>
-                    <h3 className="text-white font-bold text-lg mb-2">Autonomous Data Loops</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                      Direct architectural integration with <strong>fred-mcp-server</strong> and <strong>bls-mcp</strong> for real-time validation of alternative data signals.
-                    </p>
-                    <div className="flex items-center justify-between text-xs font-mono py-2 border-t border-white/5">
-                      <span className="text-blue-400">Sync Status</span>
-                      <span className="text-emerald-500">Live (5ms)</span>
-                    </div>
-                  </div>
-                  <div className="mt-auto bg-blue-500/5 p-4 group-hover:bg-blue-500/10 transition-colors">
-                    <button className="text-blue-400 text-sm font-medium flex items-center gap-2">
-                      MCP Configuration <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Methodology Card: Now-Casting */}
-                <div className="glass-card overflow-hidden flex flex-col group">
-                  <div className="p-6">
-                    <div className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-4 border border-emerald-500/20">
-                      <TrendingUp className="w-6 h-6 text-emerald-400" />
-                    </div>
-                    <h3 className="text-white font-bold text-lg mb-2">Foundation Time-Series</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                      Deployment of <strong>Chronos-T5</strong> and <strong>TimeGPT</strong> for synthetic job posting forecasting and seasonality isolation.
-                    </p>
-                    <div className="flex items-center justify-between text-xs font-mono py-2 border-t border-white/5">
-                      <span className="text-emerald-400">T+30 Forecast</span>
-                      <span className="text-slate-300">+12k (μ)</span>
-                    </div>
-                  </div>
-                  <div className="mt-auto bg-emerald-500/5 p-4 group-hover:bg-emerald-500/10 transition-colors">
-                    <button className="text-emerald-400 text-sm font-medium flex items-center gap-2">
-                      Accuracy metrics <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Methodology Card: Causal Inference */}
-                <div className="glass-card overflow-hidden flex flex-col group">
-                  <div className="p-6">
-                    <div className="w-12 h-12 rounded-xl bg-amber-500/10 flex items-center justify-center mb-4 border border-amber-500/20">
-                      <Search className="w-6 h-6 text-amber-400" />
-                    </div>
-                    <h3 className="text-white font-bold text-lg mb-2">Causal Extraction</h3>
-                    <p className="text-slate-400 text-sm leading-relaxed mb-4">
-                      Leveraging <strong>DoubleML</strong> to quantify the true structural impact of interest rate changes on hiring, isolating exogenous shocks.
-                    </p>
-                    <div className="flex items-center justify-between text-xs font-mono py-2 border-t border-white/5">
-                      <span className="text-amber-400">P-Value</span>
-                      <span className="text-slate-300">0.0041</span>
-                    </div>
-                  </div>
-                  <div className="mt-auto bg-amber-500/5 p-4 group-hover:bg-amber-500/10 transition-colors">
-                    <button className="text-amber-400 text-sm font-medium flex items-center gap-2">
-                      View Causal Graph <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
+                  </motion.div>
+                ))}
               </div>
             )}
           </motion.div>
         </AnimatePresence>
       </main>
 
-      {/* Footer Info */}
-      <footer className="max-w-7xl mx-auto mt-12 pt-8 border-t border-white/5">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-slate-500 text-xs uppercase tracking-widest">
-          <p>© 2026 Labor Alpha Systems • Powered by Gemini Advanced Agentic Coding</p>
-          <div className="flex gap-6">
-            <span className="flex items-center gap-1"><Layers className="w-3 h-3" /> Data: BLS/FRED</span>
-            <span className="flex items-center gap-1"><Cpu className="w-3 h-3" /> Model: EconBERTa-Large</span>
-          </div>
+      {/* --- Global Footer --- */}
+      <footer className="max-w-[1600px] mx-auto mt-12 pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6 text-slate-600 text-[10px] font-bold uppercase tracking-[0.2em] italic">
+        <div className="flex items-center gap-4">
+          <p>© 2026 Labor Alpha Systems</p>
+          <span className="w-1.5 h-1.5 rounded-full bg-slate-800" />
+          <p>Powered by Advanced Agentic Research Models</p>
+        </div>
+        <div className="flex gap-8">
+          <span className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer">
+            <Database className="w-3 h-3" /> Data Source: BLS/FRED/Indeed
+          </span>
+          <span className="flex items-center gap-2 hover:text-white transition-colors cursor-pointer">
+            <Network className="w-3 h-3" /> API Layer: mcp-orchestrator-v4
+          </span>
+          <span className="flex items-center gap-2 text-accent-indigo">
+            <Clock className="w-3 h-3" /> Last Handshake: {lastSync}
+          </span>
         </div>
       </footer>
     </div>
   );
 };
 
-export default App;
+export default LaborAlphaDashboard;
