@@ -219,36 +219,38 @@ const LaborAlphaDashboard = () => {
       </header>
 
       {/* --- Top Stats Row --- */}
-      <section className="max-w-[1600px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard 
-          title="True Job Growth (Adjusted)" 
-          value="+152K" 
-          subtext="Official: +178K (Overstated)" 
-          icon={Briefcase}
-          colorClass="text-accent-teal"
-        />
-        <StatCard 
-          title="Unemployment Rate" 
-          value="4.3%" 
-          subtext="400K exited labor force" 
-          icon={Users}
-          colorClass="text-emerald-500"
-        />
-        <StatCard 
-          title="Weather Distortion Vol." 
-          value="118K" 
-          subtext="Jobs misallocated in 6 mos" 
-          icon={CloudLightning}
-          colorClass="text-accent-amber"
-        />
-        <StatCard 
-          title="Core Wage Growth" 
-          value="3.5%" 
-          subtext="Cooling from 3.8% peak" 
-          icon={Activity}
-          colorClass="text-accent-rose"
-        />
-      </section>
+      {activeView !== 'guide' && (
+        <section className="max-w-[1600px] mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <StatCard 
+            title="True Job Growth (Adjusted)" 
+            value="+152K" 
+            subtext="Official: +178K (Overstated)" 
+            icon={Briefcase}
+            colorClass="text-accent-teal"
+          />
+          <StatCard 
+            title="Unemployment Rate" 
+            value="4.3%" 
+            subtext="400K exited labor force" 
+            icon={Users}
+            colorClass="text-emerald-500"
+          />
+          <StatCard 
+            title="Weather Distortion Vol." 
+            value="118K" 
+            subtext="Jobs misallocated in 6 mos" 
+            icon={CloudLightning}
+            colorClass="text-accent-amber"
+          />
+          <StatCard 
+            title="Core Wage Growth" 
+            value="3.5%" 
+            subtext="Cooling from 3.8% peak" 
+            icon={Activity}
+            colorClass="text-accent-rose"
+          />
+        </section>
+      )}
 
       {/* --- Main Dashboard Content --- */}
       <main className="max-w-[1600px] mx-auto">
