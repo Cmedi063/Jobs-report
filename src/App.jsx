@@ -554,6 +554,33 @@ const LaborAlphaDashboard = () => {
                     </ResponsiveContainer>
                   </div>
                 </div>
+
+                {/* Bottom Insights Notes */}
+                <div className="col-span-12 glass-card-premium p-8 mt-4 relative overflow-hidden">
+                  <div className="grid grid-cols-12 gap-8 relative z-10">
+                    <div className="col-span-12 lg:col-span-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <TrendingDown size={16} className="text-rose-500" />
+                        <h4 className="text-[11px] font-black text-rose-500 uppercase tracking-widest font-sans">Claims Divergence</h4>
+                      </div>
+                      <p className="text-slate-400 text-[13px] leading-relaxed font-sans">
+                        Continuing claims edging up slightly above 1.9M tells a nuanced story: <span className="text-white font-bold">while people aren't being fired in droves (initial claims remain low), it's taking them longer to find new work</span> once they are let go. Employer hoarding is keeping initial claims suppressed.
+                      </p>
+                    </div>
+                    
+                    <div className="col-span-12 lg:col-span-6 border-l border-slate-800/50 pl-0 lg:pl-8">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Activity size={16} className="text-sky-500" />
+                        <h4 className="text-[11px] font-black text-sky-500 uppercase tracking-widest font-sans">The Real-Time Chill</h4>
+                      </div>
+                      <p className="text-slate-400 text-[13px] leading-relaxed font-sans">
+                        While the monthly jobs report prints strong numbers, alternative data from Indeed shows job postings dropping to 110 (just 10% above pre-pandemic levels). <span className="text-white font-bold">The momentum oscillator has turned negative.</span> This predicts weaker official BLS prints in the next 1-2 months.
+                      </p>
+                    </div>
+                  </div>
+                  {/* Visual Gradient Footer */}
+                  <div className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-rose-500 via-violet-500 to-sky-500 opacity-80"></div>
+                </div>
               </>
             )}
 
