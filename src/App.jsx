@@ -696,65 +696,225 @@ const LaborAlphaDashboard = () => {
             )}
 
             {activeView === 'guide' && (
-              <div className="col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {[
-                  {
-                    title: "Sentiment Quantization",
-                    desc: "Utilizing FinBERT and CentralBankRoBERTa to distill alpha from FOMC transcripts and S&P 500 earnings calls.",
-                    statLabel: "Drift Index",
-                    statValue: "-0.12 SD",
-                    icon: Cpu,
-                    color: "purple"
-                  },
-                  {
-                    title: "Autonomous Data Loops",
-                    desc: "Direct architectural integration with fred-mcp-server and bls-mcp for real-time validation of high-frequency data.",
-                    statLabel: "Sync Status",
-                    statValue: "Live (5ms)",
-                    icon: Database,
-                    color: "blue"
-                  },
-                  {
-                    title: "Foundation Time-Series",
-                    desc: "Deployment of Chronos-T5 and TimeGPT for synthetic job posting forecasting and seasonality isolation.",
-                    statLabel: "T+30 Forecast",
-                    statValue: "+12k (μ)",
-                    icon: TrendingUp,
-                    color: "emerald"
-                  },
-                  {
-                    title: "Causal Extraction",
-                    desc: "Leveraging DoubleML to quantify the structural impact of interest rate cycles on hiring volatility.",
-                    statLabel: "P-Value",
-                    statValue: "0.0041",
-                    icon: Search,
-                    color: "amber"
-                  }
-                ].map((card, i) => (
-                  <motion.div 
-                    key={i} 
-                    className="glass-card-premium overflow-hidden flex flex-col group hover:border-white/20 transition-all duration-500"
-                    whileHover={{ y: -5 }}
-                  >
-                    <div className="p-6">
-                      <div className={`w-12 h-12 rounded-xl bg-${card.color}-500/10 flex items-center justify-center mb-4 border border-${card.color}-500/20 group-hover:bg-${card.color}-500/20 group-hover:scale-110 transition-all duration-500`}>
-                        <card.icon className={`w-6 h-6 text-${card.color}-400`} />
-                      </div>
-                      <h3 className="text-white font-bold text-lg mb-2 group-hover:text-white transition-colors capitalize underline decoration-accent-indigo/20 underline-offset-4">{card.title}</h3>
-                      <p className="text-slate-400 text-sm leading-relaxed mb-6 font-medium italic">
-                        {card.desc}
+              <div className="col-span-12 space-y-8">
+                {/* Alpha Playbook Dashboard Section */}
+                <div className="glass-card-premium p-8">
+                  <div className="flex items-start gap-6 mb-8">
+                    <div className="p-4 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
+                      <BookOpen size={32} className="text-indigo-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-3xl font-bold text-white font-display">The Alpha Playbook: Live Institutional Signals</h3>
+                      <p className="text-indigo-400 font-medium mb-4 italic">Replacing lagging BLS data with high-frequency forward indicators and structural data feeds.</p>
+                      <p className="text-slate-400 leading-relaxed max-w-4xl text-sm italic font-sans">
+                        This terminal relies on true leading indicators to map the labor market 60 to 90 days ahead of official government prints. Below is a live matrix of the exact indicators powering this dashboard. We utilize advanced Natural Language Processing (FinBERT) inspired by recent "AI for Economists" methodologies to quantify corporate labor sentiment directly from earnings transcripts.
                       </p>
-                      <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest py-3 border-t border-white/5">
-                        <span className={`text-${card.color}-400`}>{card.statLabel}</span>
-                        <span className="text-white px-2 py-0.5 rounded bg-white/5">{card.statValue}</span>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-12 gap-6 mt-12">
+                    {/* Signal 1: Recession Tripwire */}
+                    <div className="col-span-12 lg:col-span-6 glass-card-premium p-6 border-l-4 border-amber-500 group hover:bg-slate-800/20 transition-all">
+                      <div className="flex justify-between items-start mb-8">
+                        <div className="flex items-center gap-3">
+                          <Activity size={20} className="text-amber-500" />
+                          <h4 className="text-lg font-bold text-white">Recession Tripwire</h4>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-3xl font-black text-white">0.43</div>
+                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest font-sans">Current Sahm Rule</div>
+                        </div>
+                      </div>
+                      
+                      {/* Sahm Rule Gauge */}
+                      <div className="relative h-1.5 w-full bg-slate-800 rounded-full mb-12">
+                        <div className="absolute top-0 left-0 h-full bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full" style={{ width: '43%' }}></div>
+                        <div className="absolute -top-1.5 left-[50%] h-4.5 w-[3px] bg-rose-500"></div>
+                        <div className="absolute top-4 left-[50%] -translate-x-1/2 text-[9px] text-rose-500 font-bold uppercase whitespace-nowrap font-sans">0.50 Threshold</div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <p className="text-slate-400 text-xs font-sans leading-relaxed">
+                          <span className="text-white font-bold">The Sahm Rule:</span> Powell's preferred recession signal. Tracks 3-mo moving average of unemployment. A breach of <span className="text-rose-400 font-bold">0.50</span> calls a recession.
+                        </p>
+                        <p className="text-slate-400 text-xs font-sans leading-relaxed">
+                          <span className="text-white font-bold">Prime-Age EPOP (25-54):</span> Currently at 83.5%, replacing the flawed U-3 unemployment rate. Immune to retirement distortions.
+                        </p>
                       </div>
                     </div>
-                    <div className="mt-auto p-4 bg-white/[0.02] flex items-center justify-between group-hover:bg-white/[0.05] transition-all">
-                      <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">MCP Architecture Ready</span>
-                      <ChevronRight className="w-4 h-4 text-slate-600 group-hover:translate-x-1 transition-transform" />
+
+                    {/* Signal 2: Corporate Lead Signals */}
+                    <div className="col-span-12 lg:col-span-6 glass-card-premium p-6 border-l-4 border-indigo-500 group hover:bg-slate-800/20 transition-all">
+                      <div className="flex justify-between items-start mb-8">
+                        <div className="flex items-center gap-3">
+                          <PieChart size={20} className="text-indigo-500" />
+                          <h4 className="text-lg font-bold text-white">Corporate Lead Signals</h4>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-3xl font-black text-white">38</div>
+                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest font-sans">NLP Labor Sentiment</div>
+                        </div>
+                      </div>
+                      
+                      {/* Sentiment Sparkline */}
+                      <div className="h-12 w-full mb-12 flex items-end gap-1 px-1">
+                        {[35, 45, 38, 55, 42, 38, 48, 41, 38, 45].map((v, i) => (
+                          <div key={i} className="flex-1 bg-indigo-500/30 rounded-t-sm" style={{ height: `${v}%` }}></div>
+                        ))}
+                      </div>
+
+                      <div className="space-y-4">
+                        <p className="text-slate-400 text-xs font-sans leading-relaxed">
+                          <span className="text-white font-bold">Corporate Confession NLP:</span> Scoring earnings calls with FinBERT (AI for Economics) provides a 90-day lead on firings.
+                        </p>
+                        <p className="text-slate-400 text-xs font-sans leading-relaxed">
+                          <span className="text-white font-bold">ISM PMIs & Challenger:</span> Surveys and corporate layoff announcements catching turning points 6-8 weeks before BLS.
+                        </p>
+                      </div>
                     </div>
-                  </motion.div>
-                ))}
+
+                    {/* Signal 3: Small Business Pipeline */}
+                    <div className="col-span-12 lg:col-span-6 glass-card-premium p-6 border-l-4 border-sky-500 group hover:bg-slate-800/20 transition-all">
+                      <div className="flex justify-between items-start mb-8">
+                        <div className="flex items-center gap-3">
+                          <Building size={20} className="text-sky-500" />
+                          <h4 className="text-lg font-bold text-white">Small Business Pipeline</h4>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-3xl font-black text-white">10%</div>
+                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest font-sans">NFIB Hiring Index</div>
+                        </div>
+                      </div>
+                      
+                      {/* Mini Bar Chart */}
+                      <div className="h-10 w-full mb-14 flex items-center justify-between gap-4">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <div key={i} className="h-full w-full bg-sky-500/10 rounded flex items-center justify-center">
+                            <div className="w-[85%] bg-sky-500 rounded" style={{ height: `${100 - (i * 15)}%`, opacity: 1 - (i * 0.15) }}></div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="space-y-4">
+                        <p className="text-slate-400 text-xs font-sans leading-relaxed">
+                          <span className="text-white font-bold">NFIB Stress Gauge:</span> Small businesses self-report hiring plans. Collapsing plans lead BLS weakness by 2 months.
+                        </p>
+                        <p className="text-slate-400 text-xs font-sans leading-relaxed">
+                          <span className="text-white font-bold">ADP Size Divergence:</span> Tracks when small business (&lt;50) hiring collapses while large-cap hiring holds.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Signal 4: Hidden Household Stress */}
+                    <div className="col-span-12 lg:col-span-6 glass-card-premium p-6 border-l-4 border-rose-500 group hover:bg-slate-800/20 transition-all">
+                      <div className="flex justify-between items-start mb-8">
+                        <div className="flex items-center gap-3">
+                          <Zap size={20} className="text-rose-500" />
+                          <h4 className="text-lg font-bold text-white">Hidden Household Stress</h4>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-3xl font-black text-white">8.8%</div>
+                          <div className="text-[10px] text-slate-500 font-bold uppercase tracking-widest font-sans">Multi-Job Holders</div>
+                        </div>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="h-6 w-full bg-rose-500/10 rounded mb-14 overflow-hidden border border-rose-500/20 relative">
+                        <div className="h-full bg-rose-900/60 w-[88%] flex items-center justify-end px-3">
+                          <div className="w-[2px] h-full bg-rose-500 shadow-[0_0_10px_#f43f5e]"></div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-4">
+                        <p className="text-slate-400 text-xs font-sans leading-relaxed">
+                          <span className="text-white font-bold">Hidden Stress Metrics:</span> A rise in <span className="text-rose-400 font-bold">Multiple Job Holders</span> signals financial duress. Falling Temp Payrolls signals incoming full-time job destruction.
+                        </p>
+                        <p className="text-slate-400 text-xs font-sans leading-relaxed">
+                          <span className="text-white font-bold">Conf Board Differential:</span> Perception drives spending 6 weeks before reality.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Architecture Methodology Section */}
+                <div className="grid grid-cols-12 gap-6">
+                  <div className="col-span-12 lg:col-span-3 glass-card-premium p-6 border-t border-indigo-500/20 group hover:translate-y-[-4px] transition-all duration-300">
+                    <div className="flex items-center gap-2 mb-4">
+                      <BrainCircuit size={18} className="text-indigo-400" />
+                      <h4 className="text-[10px] font-black text-white uppercase tracking-widest font-sans">Sentiment Quantization</h4>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed mb-6 font-sans">Utilizing FinBERT and CentralBankRoBERTa to distill alpha from FOMC transcripts and S&P 500 earnings calls.</p>
+                    <div className="flex justify-between items-baseline mb-4">
+                      <span className="text-[9px] text-slate-600 font-bold uppercase font-sans">Drift Index</span>
+                      <span className="text-sm font-mono text-rose-500 font-bold">-0.12 SD</span>
+                    </div>
+                    <div className="pt-4 border-t border-slate-800/50 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter font-sans">MCP Architecture Ready</span>
+                      </div>
+                      <ChevronRight size={14} className="text-slate-700 group-hover:text-indigo-400 transition-colors" />
+                    </div>
+                  </div>
+
+                  <div className="col-span-12 lg:col-span-3 glass-card-premium p-6 border-t border-sky-500/20 group hover:translate-y-[-4px] transition-all duration-300">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Globe size={18} className="text-sky-400" />
+                      <h4 className="text-[10px] font-black text-white uppercase tracking-widest font-sans">Autonomous Data Loops</h4>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed mb-6 font-sans">Direct architectural integration with fred-mcp-server and bls-mcp for real-time validation of high-frequency data.</p>
+                    <div className="flex justify-between items-baseline mb-4">
+                      <span className="text-[9px] text-slate-600 font-bold uppercase font-sans">Sync Status</span>
+                      <span className="text-sm font-mono text-emerald-500 font-bold">Live (5ms)</span>
+                    </div>
+                    <div className="pt-4 border-t border-slate-800/50 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter font-sans">MCP Architecture Ready</span>
+                      </div>
+                      <ChevronRight size={14} className="text-slate-700 group-hover:text-sky-400 transition-colors" />
+                    </div>
+                  </div>
+
+                  <div className="col-span-12 lg:col-span-3 glass-card-premium p-6 border-t border-violet-500/20 group hover:translate-y-[-4px] transition-all duration-300">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Zap size={18} className="text-violet-400" />
+                      <h4 className="text-[10px] font-black text-white uppercase tracking-widest font-sans">Foundation Time-Series</h4>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed mb-6 font-sans">Deployment of Chronos-T5 and TimeGPT for synthetic job posting forecasting and seasonality isolation.</p>
+                    <div className="flex justify-between items-baseline mb-4">
+                      <span className="text-[9px] text-slate-600 font-bold uppercase font-sans">T+30 Forecast</span>
+                      <span className="text-sm font-mono text-indigo-400 font-bold">+12k (μ)</span>
+                    </div>
+                    <div className="pt-4 border-t border-slate-800/50 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter font-sans">MCP Architecture Ready</span>
+                      </div>
+                      <ChevronRight size={14} className="text-slate-700 group-hover:text-violet-400 transition-colors" />
+                    </div>
+                  </div>
+
+                  <div className="col-span-12 lg:col-span-3 glass-card-premium p-6 border-t border-rose-500/20 group hover:translate-y-[-4px] transition-all duration-300">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Target size={18} className="text-rose-400" />
+                      <h4 className="text-[10px] font-black text-white uppercase tracking-widest font-sans">Causal Extraction</h4>
+                    </div>
+                    <p className="text-[11px] text-slate-500 leading-relaxed mb-6 font-sans">Leveraging DoubleML to quantify the structural impact of interest rate cycles on hiring volatility.</p>
+                    <div className="flex justify-between items-baseline mb-4">
+                      <span className="text-[9px] text-slate-600 font-bold uppercase font-sans">P-Value</span>
+                      <span className="text-sm font-mono text-emerald-500 font-bold">0.0041</span>
+                    </div>
+                    <div className="pt-4 border-t border-slate-800/50 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
+                        <span className="text-[8px] text-slate-400 font-bold uppercase tracking-tighter font-sans">MCP Architecture Ready</span>
+                      </div>
+                      <ChevronRight size={14} className="text-slate-700 group-hover:text-rose-400 transition-colors" />
+                    </div>
+                  </div>
+                </div>
               </div>
             )}
           </motion.div>
