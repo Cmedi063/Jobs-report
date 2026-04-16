@@ -103,19 +103,27 @@ const LaborAlphaDashboard = () => {
   ];
 
   const fedSoftLandingData = [
-    { name: 'Q1 25', productivity: 0.1, ulc: 4.5 },
-    { name: 'Q2 25', productivity: 1.2, ulc: 3.2 },
-    { name: 'Q3 25', productivity: 4.8, ulc: 0.5 },
-    { name: 'Q4 25', productivity: 3.2, ulc: 0.6 },
+    { name: 'Q1 25', productivity: -0.2, ulc: 4.5 },
+    { name: 'Q2 25', productivity: 1.5, ulc: 3.2 },
+    { name: 'Q3 25', productivity: 5.0, ulc: 0.5 },
+    { name: 'Q4 25', productivity: 3.5, ulc: 0.6 },
     { name: 'Q1 26', productivity: 2.8, ulc: 0.8 }
   ];
 
   const consumerSqueezeData = [
-    { name: 'Q1 25', realWage: -0.8, delinquency: 2.1 },
-    { name: 'Q2 25', realWage: 0.2, delinquency: 2.4 },
+    { name: 'Q1 25', realWage: -0.5, delinquency: 2.4 },
+    { name: 'Q2 25', realWage: 0.1, delinquency: 2.6 },
     { name: 'Q3 25', realWage: 0.8, delinquency: 2.8 },
-    { name: 'Q4 25', realWage: 1.1, delinquency: 3.2 },
-    { name: 'Q1 26', realWage: 0.9, delinquency: 3.5 }
+    { name: 'Q4 25', realWage: 1.2, delinquency: 3.1 },
+    { name: 'Q1 26', realWage: 0.9, delinquency: 3.3 }
+  ];
+
+  const macroAnchorData = [
+    { name: 'Q1 25', gdp: 2.2, cpi: 3.8 },
+    { name: 'Q2 25', gdp: 2.2, cpi: 3.6 },
+    { name: 'Q3 25', gdp: 4.8, cpi: 3.2 },
+    { name: 'Q4 25', gdp: 3.2, cpi: 3.1 },
+    { name: 'Q1 26', gdp: 2.4, cpi: 2.8 }
   ];
   const SectorTooltip = ({ active, payload }) => {
     if (active && payload && payload.length) {
@@ -586,48 +594,103 @@ const LaborAlphaDashboard = () => {
 
             {activeView === 'fed' && (
               <>
-                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6">
+                {/* Row 1: Engine & Squeeze */}
+                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6 border-t-2 border-emerald-500/30">
                   <h3 className="text-xl font-bold text-white font-display mb-1">The Soft Landing Engine</h3>
                   <p className="text-slate-500 text-xs mb-12 italic">Labor Productivity vs Unit Labor Costs (ULC) %</p>
-                  <div className="h-[400px]">
+                  <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <ComposedChart data={fedSoftLandingData}>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="name" stroke="#475569" fontSize={11} />
-                        <YAxis stroke="#475569" fontSize={11} />
-                        <Tooltip />
-                        <Legend />
-                        <Bar dataKey="productivity" name="Productivity Growth" fill="#14b8a6" radius={[4, 4, 0, 0]} barSize={30} />
-                        <Line type="monotone" dataKey="ulc" name="Unit Labor Costs" stroke="#f43f5e" strokeWidth={3} dot={{ r: 5 }} />
+                      <ComposedChart data={fedSoftLandingData} margin={{ top: 10, right: 30, left: 10, bottom: 20 }}>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                        <XAxis dataKey="name" stroke="#475569" fontSize={10} axisLine={false} tickLine={false} dy={10} />
+                        <YAxis stroke="#475569" fontSize={10} axisLine={false} tickLine={false} domain={[-2, 6]} ticks={[-2, 0, 2, 4, 6]} />
+                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }} />
+                        <Legend align="center" verticalAlign="bottom" iconType="rect" wrapperStyle={{ paddingTop: '30px', fontSize: '10px' }} />
+                        <ReferenceLine y={0} stroke="#475569" strokeWidth={1} />
+                        <Bar dataKey="productivity" name="Productivity Growth" fill="#10b981" radius={[2, 2, 0, 0]} barSize={15} />
+                        <Line type="monotone" dataKey="ulc" name="Unit Labor Costs" stroke="#f43f5e" strokeWidth={3} dot={{ r: 4, fill: '#f43f5e' }} />
                       </ComposedChart>
                     </ResponsiveContainer>
                   </div>
                 </div>
-                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6">
+
+                <div className="col-span-12 lg:col-span-6 glass-card-premium p-6 border-t-2 border-rose-500/30">
                   <h3 className="text-xl font-bold text-white font-display mb-1">The Consumer Squeeze</h3>
                   <p className="text-slate-500 text-xs mb-12 italic">Real Wage Growth vs Credit Card Delinquencies (%)</p>
-                  <div className="h-[400px]">
+                  <div className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={consumerSqueezeData}>
+                      <ComposedChart data={consumerSqueezeData} margin={{ top: 10, right: 30, left: 10, bottom: 20 }}>
                         <defs>
-                          <linearGradient id="roseGradient" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="5%" stopColor="#f43f5e" stopOpacity={0.3}/>
-                            <stop offset="95%" stopColor="#f43f5e" stopOpacity={0}/>
+                          <linearGradient id="purpleGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#a855f7" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#a855f7" stopOpacity={0}/>
                           </linearGradient>
                         </defs>
-                        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                        <XAxis dataKey="name" stroke="#475569" fontSize={11} />
-                        <YAxis stroke="#475569" fontSize={11} />
-                        <Tooltip />
-                        <Legend />
-                        <Area type="monotone" dataKey="realWage" name="Real Wage Growth" stroke="#8b5cf6" strokeWidth={3} fill="#8b5cf610" />
-                        <Line type="monotone" dataKey="delinquency" name="CC Delinquency Rate" stroke="#f43f5e" strokeWidth={3} strokeDasharray="5 5" />
-                      </AreaChart>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                        <XAxis dataKey="name" stroke="#475569" fontSize={10} axisLine={false} tickLine={false} dy={10} />
+                        <YAxis yAxisId="left" stroke="#a855f7" fontSize={10} axisLine={false} tickLine={false} domain={[-0.5, 1.5]} ticks={[-0.5, 0, 0.5, 1, 1.5]} />
+                        <YAxis yAxisId="right" orientation="right" stroke="#ef4444" fontSize={10} axisLine={false} tickLine={false} domain={[2, 4]} ticks={[2, 2.5, 3, 3.5, 4]} />
+                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }} />
+                        <Legend align="center" verticalAlign="bottom" iconType="circle" wrapperStyle={{ paddingTop: '30px', fontSize: '10px' }} />
+                        <Area yAxisId="left" type="monotone" dataKey="realWage" name="Real Wage Growth" fill="url(#purpleGradient)" stroke="#a855f7" strokeWidth={2} />
+                        <Line yAxisId="right" type="monotone" dataKey="delinquency" name="CC Delinquency Rate" stroke="#ef4444" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 4, fill: '#ef4444' }} />
+                      </ComposedChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="mt-8 flex justify-end">
-                    <div className="px-3 py-1 bg-emerald-500/10 text-emerald-500 text-[9px] font-bold rounded border border-emerald-500/20 uppercase">Quarterly Data</div>
+                </div>
+
+                {/* Row 2: Macro Anchor */}
+                <div className="col-span-12 glass-card-premium p-6">
+                  <div className="flex justify-between items-center mb-1">
+                    <h3 className="text-xl font-bold text-white font-display">The Macro Anchor</h3>
+                    <div className="px-3 py-1 bg-teal-500/10 text-teal-500 text-[9px] font-bold rounded border border-teal-500/20 uppercase italic font-sans tracking-wide">Quarterly Data</div>
                   </div>
+                  <p className="text-slate-500 text-xs mb-12 italic">Real GDP Growth vs. Headline CPI YoY (%)</p>
+                  <div className="h-[350px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <ComposedChart data={macroAnchorData} margin={{ top: 10, right: 30, left: 10, bottom: 20 }}>
+                        <defs>
+                          <linearGradient id="tealGradient" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="5%" stopColor="#14b8a6" stopOpacity={0.3}/>
+                            <stop offset="95%" stopColor="#14b8a6" stopOpacity={0}/>
+                          </linearGradient>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
+                        <XAxis dataKey="name" stroke="#475569" fontSize={10} axisLine={false} tickLine={false} dy={10} />
+                        <YAxis stroke="#475569" fontSize={10} axisLine={false} tickLine={false} domain={[0, 6]} ticks={[0, 2, 4, 6]} />
+                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }} />
+                        <Legend align="center" verticalAlign="bottom" iconType="circle" wrapperStyle={{ paddingTop: '30px', fontSize: '10px' }} />
+                        <Area type="monotone" dataKey="gdp" name="Real GDP Growth (%)" fill="url(#tealGradient)" stroke="#14b8a6" strokeWidth={2} />
+                        <Line type="monotone" dataKey="cpi" name="CPI Inflation YoY (%)" stroke="#38bdf8" strokeWidth={3} dot={{ r: 4, fill: '#38bdf8' }} />
+                      </ComposedChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
+
+                {/* Row 3: Insights Footer */}
+                <div className="col-span-12 glass-card-premium p-8 relative overflow-hidden">
+                  <div className="grid grid-cols-12 gap-8 relative z-10">
+                    <div className="col-span-12 lg:col-span-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Zap size={16} className="text-emerald-500" />
+                        <h4 className="text-[11px] font-black text-emerald-500 uppercase tracking-widest font-sans">Productivity: The Magic Bullet</h4>
+                      </div>
+                      <p className="text-slate-400 text-[13px] leading-relaxed font-sans">
+                        How is the economy growing at 2.4% with 3.5% wage growth, but inflation is dropping? <span className="text-white font-bold">Productivity.</span> Tech and AI integrations are causing productivity to spike (+2.8%), which crushes Unit Labor Costs down to 0.8%. Businesses don't need to raise prices if workers are producing more per hour.
+                      </p>
+                    </div>
+                    
+                    <div className="col-span-12 lg:col-span-6 border-l border-slate-800/50 pl-0 lg:pl-8">
+                      <div className="flex items-center gap-2 mb-3">
+                        <AlertCircle size={16} className="text-rose-500" />
+                        <h4 className="text-[11px] font-black text-rose-500 uppercase tracking-widest font-sans">The K-Shaped Consumer Limit</h4>
+                      </div>
+                      <p className="text-slate-400 text-[13px] leading-relaxed font-sans">
+                        Despite real wages finally turning positive (purple area), credit card delinquency rates (red dotted line) have breached 3.3%. This confirms a K-shaped economy: the top 50% are benefiting from strong asset prices and jobs, while the bottom 50% have exhausted savings and are struggling with cumulative inflation.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="absolute bottom-0 left-0 w-full h-[3px] bg-gradient-to-r from-emerald-500 via-rose-500 to-amber-500 opacity-80"></div>
                 </div>
               </>
             )}
